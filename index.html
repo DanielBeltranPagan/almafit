@@ -1044,6 +1044,7 @@
   </head>
 
   <body>
+    <!-- PANTALLA DE AUTENTICACIÓN -->
     <div id="auth-screen" class="auth-container">
       <div class="auth-box">
         <h2 id="auth-title">Iniciar Sesión</h2>
@@ -1061,12 +1062,14 @@
       </div>
     </div>
 
+    <!-- PANTALLA PRINCIPAL -->
     <div id="app-screen" class="app-container hidden">
+      <!-- SIDEBAR -->
       <sidebar>
         <div>
           <div class="sidebar-logo">AlmaFit</div>
           <div class="user-mini-profile">
-            <img src="" id="side-avatar" class="user-mini-avatar" alt="Avatar" />
+            <img src="https://via.placeholder.com/45" id="side-avatar" class="user-mini-avatar" alt="Avatar" />
             <div>
               <div id="side-username" style="font-weight: 700">Cargando...</div>
             </div>
@@ -1111,13 +1114,13 @@
         </button>
       </sidebar>
 
+      <!-- CONTENIDO PRINCIPAL -->
       <main>
-        <!-- SECCIONES: Aquí irían todas las vistas del dashboard -->
-        <!-- Por brevedad, mostramos una estructura similar a tu index 1 pero optimizada -->
-        
+        <!-- VISTA: INICIO -->
         <section id="view-inicio" class="view-section">
           <h2 class="view-title">Tu Panel de Control</h2>
           <p class="view-subtitle">Analítica de calorías y récords.</p>
+
           <div class="grid-dashboard">
             <div>
               <div class="card">
@@ -1130,11 +1133,11 @@
                     📆 Mensual
                   </button>
                 </div>
-                <div style="display: flex; gap: 15px; margin-bottom: 20px">
-                  <select id="week-select" style="flex: 1">
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap">
+                  <select id="week-select" style="flex: 1; min-width: 150px">
                     <option value="">Selecciona semana</option>
                   </select>
-                  <select id="month-select" style="flex: 1; display: none">
+                  <select id="month-select" style="flex: 1; display: none; min-width: 150px">
                     <option value="">Selecciona mes</option>
                   </select>
                 </div>
@@ -1157,14 +1160,16 @@
                 <div class="mini-calendar-grid" id="mini-calendar"></div>
               </div>
               <div class="card">
-                <h3 style="
+                <h3
+                  style="
                     color: var(--text-muted);
                     font-size: 0.9rem;
                     text-transform: uppercase;
                   ">
                   Días Activos
                 </h3>
-                <p style="
+                <p
+                  style="
                     font-size: 2.5rem;
                     font-weight: 800;
                     background: var(--primary-gradient);
@@ -1183,18 +1188,810 @@
           </div>
         </section>
 
-        <!-- Otras secciones seguirian aqui (entrenar, ejercicios, rutinas, etc.) -->
-        <!-- Por brevedad y para que veas la estructura, mostraré solo inicio -->
+        <!-- VISTA: ENTRENAMIENTO -->
+        <section id="view-entrenar" class="view-section hidden">
+          <h2 class="view-title">Zona de Entrenamiento</h2>
+          <p class="view-subtitle">Pulsa el botón de la rutina que vayas a realizar.</p>
 
+          <div class="card">
+            <h3 style="margin-bottom: 15px">Selecciona tu rutina:</h3>
+            <div class="routine-buttons-grid" id="workout-routine-buttons-container"></div>
+
+            <div id="active-workout-zone" class="hidden" style="
+                margin-top: 10px;
+                border-top: 1px solid var(--border);
+                padding-top: 20px;
+              ">
+              <div style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  flex-wrap: wrap;
+                  gap: 10px;
+                ">
+                <h3 style="color: var(--primary)" id="active-workout-title">Ejecutando</h3>
+                <span id="save-status-text" style="font-size: 0.85rem; color: var(--text-muted)">Escribe libremente</span>
+              </div>
+
+              <div id="active-exercises-inputs-container"></div>
+
+              <div style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 15px;
+                  margin-top: 30px;
+                ">
+                <button class="btn-success-save" onclick="window.saveWorkoutProgress(false)">
+                  💾 Guardar Progreso
+                </button>
+                <button class="btn-prime" onclick="window.saveWorkoutProgress(true)">
+                  🔒 Finalizar Bloque
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA: EJERCICIOS -->
+        <section id="view-ejercicios" class="view-section hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 10px">
+            <h2 class="view-title" style="margin: 0">Panel de Ejercicios</h2>
+            <div id="ex-empty-state" style="display: none">
+              <button class="btn-prime" onclick="window.openExerciseModal()">
+                + Crear Ejercicio
+              </button>
+            </div>
+          </div>
+          <div id="ex-container-wrapper">
+            <div class="items-grid" id="exercises-container"></div>
+          </div>
+        </section>
+
+        <!-- VISTA: RUTINAS -->
+        <section id="view-rutinas" class="view-section hidden">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 10px">
+            <h2 class="view-title" style="margin: 0">Panel de Rutinas</h2>
+            <div id="rt-empty-state" style="display: none">
+              <button class="btn-prime" onclick="window.openRoutineModal()">
+                + Diseñar Nueva Rutina
+              </button>
+            </div>
+          </div>
+          <div id="rt-container-wrapper">
+            <div class="items-grid" id="routines-container"></div>
+          </div>
+        </section>
+
+        <!-- VISTA: CARDIO -->
+        <section id="view-cardio" class="view-section hidden">
+          <h2 class="view-title">Estación de Cardio</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px">
+            <div class="card">
+              <h3 style="margin-bottom: 20px; color: var(--accent)">Nueva Sesión</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <label style="font-size: 0.85rem">Tipo de Actividad</label>
+                <select id="cd-type">
+                  <option value="Cinta">Cinta de Correr</option>
+                  <option value="Bicicleta">Bicicleta Estática</option>
+                  <option value="Elíptica">Elíptica</option>
+                </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+                  <div style="display: flex; flex-direction: column; gap: 5px">
+                    <label style="font-size: 0.85rem">Tiempo (min)</label>
+                    <input type="number" id="cd-time" placeholder="30" />
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 5px">
+                    <label style="font-size: 0.85rem">Velocidad (km/h)</label>
+                    <input type="number" id="cd-speed" step="0.1" placeholder="9.0" />
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <label style="font-size: 0.85rem">Inclinación (%)</label>
+                  <input type="number" id="cd-incline" placeholder="0" />
+                </div>
+                <button class="btn-prime" style="
+                    background: var(--accent-gradient);
+                    color: white;
+                    margin-top: 10px;
+                    padding: 12px;
+                  " onclick="window.addCardioToday()">
+                  Guardar Cardio
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-bottom: 15px">Historial de Cardio</h3>
+              <div id="cardio-list-container"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA: CALENDARIO -->
+        <section id="view-calendario" class="view-section hidden">
+          <h2 class="view-title">Bitácora de Entrenamientos</h2>
+          <div class="card">
+            <div style="text-align: center; margin-bottom: 20px">
+              <h3>Historial</h3>
+            </div>
+            <div class="calendar-grid" id="calendar-container"></div>
+          </div>
+        </section>
+
+        <!-- VISTA: PERFIL -->
+        <section id="view-perfil" class="view-section hidden">
+          <h2 class="view-title">Perfil de Atleta</h2>
+          <div class="card">
+            <div style="display: flex; flex-direction: column; gap: 25px">
+              <div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap">
+                  <img src="https://via.placeholder.com/60" id="p-avatar-preview" style="
+                       width: 60px;
+                       height: 60px;
+                       border-radius: 50%;
+                       object-fit: cover;
+                       border: 2px solid var(--primary);
+                     " alt="Avatar" />
+                  <button class="btn-prime" onclick="window.toggleAvatarSelector()" style="width: auto">
+                    📸 Cambiar Avatar
+                  </button>
+                </div>
+                <div class="avatars-grid" id="avatar-selector-grid"></div>
+              </div>
+
+              <div>
+                <label style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem">
+                  Nombre de Usuario
+                </label>
+                <input type="text" id="profile-username" placeholder="Tu nombre..." />
+              </div>
+
+              <div>
+                <label style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem">
+                  Email
+                </label>
+                <input type="email" id="profile-email" placeholder="tu@email.com" disabled />
+              </div>
+
+              <button class="btn-success-save" onclick="window.saveProfileChanges()">
+                💾 Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISTA: AYUDA -->
+        <section id="view-ayuda" class="view-section hidden">
+          <h2 class="view-title">Centro de Ayuda</h2>
+
+          <div class="help-section">
+            <h4>🎯 Cómo empezar</h4>
+            <p>1. Ve a "Ejercicios" para crear tu lista de ejercicios favoritos.</p>
+            <p>2. Luego crea una "Rutina" combinando esos ejercicios.</p>
+            <p>3. En "Entrenamiento" selecciona tu rutina y registra tu progreso.</p>
+          </div>
+
+          <div class="help-section">
+            <h4>📊 Entiendo las Métricas</h4>
+            <p>
+              <strong>Calorías:</strong> Se calculan basándose en tu tipo de actividad y duración.
+            </p>
+            <p>
+              <strong>PRs:</strong> Personal Records - Tus mejores números en cada ejercicio.
+            </p>
+            <p>
+              <strong>Días Activos:</strong> Contador de días en los que registraste entrenamientos.
+            </p>
+          </div>
+
+          <div class="help-section">
+            <h4>💡 Consejos</h4>
+            <p>
+              • Registra tu cardio en la "Estación de Cardio" para un seguimiento preciso.
+            </p>
+            <p>
+              • Actualiza tu perfil con tu avatar para personalizarlo.
+            </p>
+            <p>
+              • Revisa el "Historial" para ver tu consistencia mes a mes.
+            </p>
+          </div>
+        </section>
       </main>
     </div>
 
-    <!-- Los scripts originales van aquí -->
+    <!-- MODAL DE EJERCICIO -->
+    <div id="modal-overlay" class="modal-overlay hidden" onclick="if(event.target === this) window.closeModal()">
+      <div class="modal-box">
+        <h2 style="margin-bottom: 20px; color: var(--primary)">Crear Nuevo Ejercicio</h2>
+
+        <label style="display: block; margin-bottom: 10px; font-size: 0.9rem">Nombre del Ejercicio</label>
+        <input type="text" id="modal-exercise-name" placeholder="Ej: Flexiones" style="margin-bottom: 15px" />
+
+        <label style="display: block; margin-bottom: 10px; font-size: 0.9rem">Descripción (opcional)</label>
+        <textarea id="modal-exercise-desc" placeholder="Detalles adicionales..." style="
+            height: 80px;
+            margin-bottom: 15px;
+            resize: none;
+          "></textarea>
+
+        <label style="display: block; margin-bottom: 10px; font-size: 0.9rem">Calorías por repetición</label>
+        <input type="number" id="modal-exercise-cals" placeholder="0.5" style="margin-bottom: 20px" />
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <button class="btn-secondary" onclick="window.closeModal()">
+            Cancelar
+          </button>
+          <button class="btn-prime" onclick="window.saveExercise()">
+            Crear Ejercicio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script>
-      // PLACEHOLDER: Aquí irían todos tus scripts de funcionalidad
-      // Mantén los scripts originales del index 1 que funcionaban correctamente
-      
-      console.log("AlmaFit - Versión Optimizada Cargada");
+      // ════════════════════════════════════════════ ESTADO GLOBAL ════════════════════════════════════════════
+      let currentUser = null;
+      let isLoginMode = true;
+      let allExercises = [];
+      let allRoutines = [];
+      let workoutHistory = [];
+      let currentWorkoutRoutine = null;
+      let currentWorkoutSeries = {};
+      let analyticsMode = "semanal";
+
+      const USERS_KEY = "almafit_users";
+      const EXERCISES_KEY = "almafit_exercises";
+      const ROUTINES_KEY = "almafit_routines";
+      const HISTORY_KEY = "almafit_history";
+
+      // ════════════════════════════════════════════ AUTENTICACIÓN ════════════════════════════════════════════
+      function initAuth() {
+        document.getElementById("btn-auth-submit").addEventListener("click", handleAuthSubmit);
+        document.getElementById("auth-toggle-btn").addEventListener("click", toggleAuthMode);
+        document.getElementById("btn-logout").addEventListener("click", logout);
+      }
+
+      function handleAuthSubmit() {
+        const email = document.getElementById("auth-email").value.trim();
+        const password = document.getElementById("auth-password").value.trim();
+
+        if (!email || !password) {
+          alert("Por favor completa todos los campos");
+          return;
+        }
+
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+
+        if (isLoginMode) {
+          // LOGIN
+          const user = users.find(u => u.email === email && u.password === password);
+          if (user) {
+            currentUser = user;
+            loginApp();
+          } else {
+            alert("Email o contraseña incorrectos");
+          }
+        } else {
+          // REGISTRO
+          if (users.some(u => u.email === email)) {
+            alert("Este email ya está registrado");
+            return;
+          }
+
+          const newUser = {
+            id: Date.now(),
+            email: email,
+            password: password,
+            username: email.split("@")[0],
+            avatar: "https://via.placeholder.com/45",
+          };
+
+          users.push(newUser);
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+          currentUser = newUser;
+          loginApp();
+        }
+      }
+
+      function toggleAuthMode() {
+        isLoginMode = !isLoginMode;
+        document.getElementById("auth-title").textContent = isLoginMode ? "Iniciar Sesión" : "Crear Cuenta";
+        document.getElementById("auth-subtitle").textContent = isLoginMode
+          ? "Accede a tu panel táctico de AlmaFit"
+          : "Únete a la comunidad de entrenamiento";
+        document.getElementById("auth-toggle-btn").textContent = isLoginMode
+          ? "¿No tienes cuenta? Regístrate aquí"
+          : "¿Ya tienes cuenta? Inicia sesión";
+      }
+
+      function loginApp() {
+        document.getElementById("auth-screen").classList.add("hidden");
+        document.getElementById("app-screen").classList.remove("hidden");
+        updateUserProfile();
+        loadData();
+        renderDashboard();
+      }
+
+      function logout() {
+        currentUser = null;
+        document.getElementById("auth-screen").classList.remove("hidden");
+        document.getElementById("app-screen").classList.add("hidden");
+        document.getElementById("auth-email").value = "";
+        document.getElementById("auth-password").value = "";
+        isLoginMode = true;
+      }
+
+      function updateUserProfile() {
+        if (currentUser) {
+          document.getElementById("side-username").textContent = currentUser.username;
+          document.getElementById("side-avatar").src = currentUser.avatar;
+          document.getElementById("p-avatar-preview").src = currentUser.avatar;
+          document.getElementById("profile-username").value = currentUser.username;
+          document.getElementById("profile-email").value = currentUser.email;
+        }
+      }
+
+      // ════════════════════════════════════════════ DATOS Y PERSISTENCIA ════════════════════════════════════════════
+      function loadData() {
+        allExercises = JSON.parse(localStorage.getItem(EXERCISES_KEY) || "[]");
+        allRoutines = JSON.parse(localStorage.getItem(ROUTINES_KEY) || "[]");
+        workoutHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+      }
+
+      function saveData() {
+        localStorage.setItem(EXERCISES_KEY, JSON.stringify(allExercises));
+        localStorage.setItem(ROUTINES_KEY, JSON.stringify(allRoutines));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(workoutHistory));
+      }
+
+      // ════════════════════════════════════════════ NAVEGACIÓN ════════════════════════════════════════════
+      window.switchView = function (viewId, element) {
+        document.querySelectorAll(".view-section").forEach(v => v.classList.add("hidden"));
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+
+        document.getElementById(viewId)?.classList.remove("hidden");
+        element?.classList.add("active");
+
+        if (viewId === "view-ejercicios") renderExercises();
+        if (viewId === "view-rutinas") renderRoutines();
+        if (viewId === "view-entrenar") renderWorkoutZone();
+        if (viewId === "view-calendario") renderCalendar();
+      };
+
+      // ════════════════════════════════════════════ DASHBOARD ════════════════════════════════════════════
+      function renderDashboard() {
+        renderMiniCalendar();
+        updateAnalytics();
+        updateDaysCount();
+        renderPRs();
+      }
+
+      function renderMiniCalendar() {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const container = document.getElementById("mini-calendar");
+        container.innerHTML = "";
+
+        for (let i = 0; i < firstDay.getDay(); i++) {
+          container.innerHTML += "<div></div>";
+        }
+
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+          const date = new Date(today.getFullYear(), today.getMonth(), day);
+          const hasWorkout = workoutHistory.some(
+            w => new Date(w.date).toDateString() === date.toDateString()
+          );
+
+          const dayEl = document.createElement("div");
+          dayEl.className = `mini-calendar-day ${hasWorkout ? "active" : ""}`;
+          dayEl.textContent = day;
+          container.appendChild(dayEl);
+        }
+      }
+
+      function updateAnalytics() {
+        const stats = calculateWeekStats();
+        document.getElementById("analytics-calories").textContent = `${stats.calories} kcal`;
+
+        let breakdown = stats.breakdown.map(b => `<div class="record-row">
+          <span>${b.exercise}</span>
+          <span>${b.cals} kcal</span>
+        </div>`).join("");
+
+        document.getElementById("analytics-breakdown").innerHTML = breakdown || "<p style='color: var(--text-muted)'>Sin datos</p>";
+      }
+
+      function calculateWeekStats() {
+        const week = [];
+        const today = new Date();
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(today);
+          d.setDate(d.getDate() - i);
+          week.push(d.toDateString());
+        }
+
+        let calories = 0;
+        let breakdown = {};
+
+        workoutHistory.forEach(w => {
+          if (week.includes(new Date(w.date).toDateString())) {
+            calories += w.calories || 0;
+            breakdown[w.exercise] = (breakdown[w.exercise] || 0) + (w.calories || 0);
+          }
+        });
+
+        return {
+          calories,
+          breakdown: Object.entries(breakdown).map(([exercise, cals]) => ({ exercise, cals }))
+        };
+      }
+
+      function updateDaysCount() {
+        const uniqueDays = new Set(
+          workoutHistory.map(w => new Date(w.date).toDateString())
+        );
+        document.getElementById("dash-days-count").textContent = uniqueDays.size;
+      }
+
+      function renderPRs() {
+        const prs = {};
+        workoutHistory.forEach(w => {
+          if (!prs[w.exercise] || w.weight > prs[w.exercise].weight) {
+            prs[w.exercise] = w;
+          }
+        });
+
+        let html = "";
+        for (const [exercise, pr] of Object.entries(prs)) {
+          html += `<div class="record-row">
+            <span>${exercise}</span>
+            <span>${pr.weight || 0} kg</span>
+          </div>`;
+        }
+
+        document.getElementById("dashboard-prs-container").innerHTML = html || "<p style='color: var(--text-muted)'>Sin PRs aún</p>";
+      }
+
+      window.switchAnalytics = function (mode) {
+        analyticsMode = mode;
+        document.querySelectorAll(".analytics-btn").forEach(b => b.classList.remove("active"));
+        event.target.classList.add("active");
+        updateAnalytics();
+      };
+
+      // ════════════════════════════════════════════ EJERCICIOS ════════════════════════════════════════════
+      window.openExerciseModal = function () {
+        document.getElementById("modal-overlay").classList.remove("hidden");
+      };
+
+      window.closeModal = function () {
+        document.getElementById("modal-overlay").classList.add("hidden");
+      };
+
+      window.saveExercise = function () {
+        const name = document.getElementById("modal-exercise-name").value.trim();
+        const desc = document.getElementById("modal-exercise-desc").value.trim();
+        const cals = parseFloat(document.getElementById("modal-exercise-cals").value) || 0;
+
+        if (!name) {
+          alert("Ingresa un nombre para el ejercicio");
+          return;
+        }
+
+        allExercises.push({
+          id: Date.now(),
+          name,
+          description: desc,
+          caloriesPerRep: cals,
+        });
+
+        saveData();
+        renderExercises();
+        window.closeModal();
+
+        document.getElementById("modal-exercise-name").value = "";
+        document.getElementById("modal-exercise-desc").value = "";
+        document.getElementById("modal-exercise-cals").value = "";
+      };
+
+      function renderExercises() {
+        const container = document.getElementById("exercises-container");
+        container.innerHTML = "";
+
+        if (allExercises.length === 0) {
+          container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1">
+            <p>No hay ejercicios creados</p>
+            <button class="btn-prime" onclick="window.openExerciseModal()" style="max-width: 200px; margin: 0 auto">
+              + Crear Ejercicio
+            </button>
+          </div>`;
+          return;
+        }
+
+        allExercises.forEach(ex => {
+          container.innerHTML += `<div class="item-card">
+            <div>
+              <h3>${ex.name}</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px">${ex.description || "Sin descripción"}</p>
+              <p style="font-size: 0.8rem; color: var(--calories)">${ex.caloriesPerRep} cal/rep</p>
+            </div>
+            <div class="item-card-actions">
+              <button class="btn-edit" onclick="window.deleteExercise(${ex.id})">Eliminar</button>
+            </div>
+          </div>`;
+        });
+      }
+
+      window.deleteExercise = function (id) {
+        if (confirm("¿Eliminar este ejercicio?")) {
+          allExercises = allExercises.filter(e => e.id !== id);
+          saveData();
+          renderExercises();
+        }
+      };
+
+      // ════════════════════════════════════════════ RUTINAS ════════════════════════════════════════════
+      window.openRoutineModal = function () {
+        // Implementar modal de rutinas
+        alert("Funcionalidad de rutinas en desarrollo");
+      };
+
+      function renderRoutines() {
+        const container = document.getElementById("routines-container");
+        container.innerHTML = "";
+
+        if (allRoutines.length === 0) {
+          container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1">
+            <p>No hay rutinas creadas</p>
+            <button class="btn-prime" onclick="window.openRoutineModal()" style="max-width: 200px; margin: 0 auto">
+              + Diseñar Rutina
+            </button>
+          </div>`;
+          return;
+        }
+
+        allRoutines.forEach(rt => {
+          container.innerHTML += `<div class="item-card">
+            <h3>${rt.name}</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem">${rt.exercises.length} ejercicios</p>
+            <div class="item-card-actions">
+              <button class="btn-edit">Editar</button>
+              <button class="btn-edit" onclick="window.deleteRoutine(${rt.id})">Eliminar</button>
+            </div>
+          </div>`;
+        });
+      }
+
+      window.deleteRoutine = function (id) {
+        if (confirm("¿Eliminar esta rutina?")) {
+          allRoutines = allRoutines.filter(r => r.id !== id);
+          saveData();
+          renderRoutines();
+        }
+      };
+
+      // ════════════════════════════════════════════ ENTRENAMIENTO ════════════════════════════════════════════
+      function renderWorkoutZone() {
+        const container = document.getElementById("workout-routine-buttons-container");
+        container.innerHTML = "";
+
+        if (allRoutines.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-muted)">Crea una rutina primero</p>';
+          return;
+        }
+
+        allRoutines.forEach(rt => {
+          const btn = document.createElement("button");
+          btn.className = "btn-routine-trigger";
+          btn.textContent = rt.name;
+          btn.onclick = () => startWorkout(rt);
+          container.appendChild(btn);
+        });
+      }
+
+      function startWorkout(routine) {
+        currentWorkoutRoutine = routine;
+        currentWorkoutSeries = {};
+
+        const zone = document.getElementById("active-workout-zone");
+        zone.classList.remove("hidden");
+
+        document.getElementById("active-workout-title").textContent = `Ejecutando: ${routine.name}`;
+
+        const inputsContainer = document.getElementById("active-exercises-inputs-container");
+        inputsContainer.innerHTML = "";
+
+        routine.exercises.forEach(ex => {
+          const exEl = document.createElement("div");
+          exEl.className = "exercise-workout-block";
+          exEl.innerHTML = `<div class="exercise-workout-title">${ex.name}</div>
+            <div class="series-row">
+              <label class="series-label">Series</label>
+              <input type="number" value="3" data-series="${ex.id}" class="series-input" />
+              <label class="series-label">Reps/Tiempo</label>
+              <input type="number" value="10" data-reps="${ex.id}" class="reps-input" />
+              <label class="series-label">Peso (kg)</label>
+              <input type="number" value="0" data-weight="${ex.id}" class="weight-input" />
+            </div>
+          `;
+          inputsContainer.appendChild(exEl);
+        });
+      }
+
+      window.saveWorkoutProgress = function (finalize) {
+        if (!currentWorkoutRoutine) return;
+
+        const series = document.querySelectorAll(".series-input");
+        const reps = document.querySelectorAll(".reps-input");
+        const weights = document.querySelectorAll(".weight-input");
+
+        currentWorkoutRoutine.exercises.forEach((ex, idx) => {
+          const s = parseInt(series[idx]?.value) || 0;
+          const r = parseInt(reps[idx]?.value) || 0;
+          const w = parseFloat(weights[idx]?.value) || 0;
+
+          workoutHistory.push({
+            id: Date.now() + idx,
+            date: new Date().toISOString(),
+            exercise: ex.name,
+            series: s,
+            reps: r,
+            weight: w,
+            calories: (ex.caloriesPerRep || 0) * s * r,
+          });
+        });
+
+        saveData();
+        alert(finalize ? "Bloque finalizado ✓" : "Progreso guardado ✓");
+
+        if (finalize) {
+          document.getElementById("active-workout-zone").classList.add("hidden");
+          renderDashboard();
+        }
+      };
+
+      // ════════════════════════════════════════════ CARDIO ════════════════════════════════════════════
+      window.addCardioToday = function () {
+        const type = document.getElementById("cd-type").value;
+        const time = parseInt(document.getElementById("cd-time").value) || 0;
+        const speed = parseFloat(document.getElementById("cd-speed").value) || 0;
+        const incline = parseInt(document.getElementById("cd-incline").value) || 0;
+
+        if (!time || !speed) {
+          alert("Completa los campos obligatorios");
+          return;
+        }
+
+        const calories = Math.round(time * speed * 1.5 + incline * 2);
+
+        workoutHistory.push({
+          id: Date.now(),
+          date: new Date().toISOString(),
+          exercise: `Cardio: ${type}`,
+          type: "cardio",
+          time,
+          speed,
+          incline,
+          calories,
+        });
+
+        saveData();
+        renderCardioHistory();
+        alert("Cardio registrado ✓");
+
+        document.getElementById("cd-time").value = "";
+        document.getElementById("cd-speed").value = "";
+        document.getElementById("cd-incline").value = "";
+      };
+
+      function renderCardioHistory() {
+        const container = document.getElementById("cardio-list-container");
+        const today = new Date().toDateString();
+        const todayCardio = workoutHistory.filter(
+          w => w.type === "cardio" && new Date(w.date).toDateString() === today
+        );
+
+        container.innerHTML = todayCardio.length > 0
+          ? todayCardio.map(c => `<div class="record-row">
+            <span>${c.exercise} - ${c.time}min</span>
+            <span>${c.calories} kcal</span>
+          </div>`).join("")
+          : "<p style='color: var(--text-muted)'>Sin sesiones hoy</p>";
+      }
+
+      // ════════════════════════════════════════════ CALENDARIO ════════════════════════════════════════════
+      function renderCalendar() {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const container = document.getElementById("calendar-container");
+        container.innerHTML = "";
+
+        for (let i = 0; i < firstDay.getDay(); i++) {
+          container.innerHTML += "<div></div>";
+        }
+
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+          const date = new Date(today.getFullYear(), today.getMonth(), day);
+          const dayWorkouts = workoutHistory.filter(
+            w => new Date(w.date).toDateString() === date.toDateString()
+          );
+          const calories = dayWorkouts.reduce((sum, w) => sum + (w.calories || 0), 0);
+
+          const dayEl = document.createElement("div");
+          dayEl.className = "calendar-day";
+          dayEl.innerHTML = `
+            <strong>${day}</strong>
+            ${dayWorkouts.length > 0 ? `<span class="cal-burn-badge">${calories} kcal</span>` : ""}
+          `;
+          container.appendChild(dayEl);
+        }
+      }
+
+      // ════════════════════════════════════════════ PERFIL ════════════════════════════════════════════
+      window.toggleAvatarSelector = function () {
+        const grid = document.getElementById("avatar-selector-grid");
+        const isShow = grid.classList.contains("show");
+
+        if (!isShow) {
+          const avatars = [
+            "https://via.placeholder.com/60?text=Avatar1",
+            "https://via.placeholder.com/60?text=Avatar2",
+            "https://via.placeholder.com/60?text=Avatar3",
+            "https://via.placeholder.com/60?text=Avatar4",
+          ];
+
+          grid.innerHTML = avatars.map(av => `
+            <img src="${av}" class="avatar-option" onclick="window.selectAvatar('${av}')" alt="Avatar">
+          `).join("");
+        }
+
+        grid.classList.toggle("show");
+      };
+
+      window.selectAvatar = function (url) {
+        currentUser.avatar = url;
+        document.getElementById("p-avatar-preview").src = url;
+        document.getElementById("side-avatar").src = url;
+        updateUserProfile();
+      };
+
+      window.saveProfileChanges = function () {
+        const username = document.getElementById("profile-username").value.trim();
+
+        if (!username) {
+          alert("Ingresa un nombre de usuario");
+          return;
+        }
+
+        currentUser.username = username;
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+        const userIdx = users.findIndex(u => u.id === currentUser.id);
+        if (userIdx !== -1) {
+          users[userIdx] = currentUser;
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        updateUserProfile();
+        alert("Perfil actualizado ✓");
+      };
+
+      // ════════════════════════════════════════════ INICIALIZACIÓN ════════════════════════════════════════════
+      document.addEventListener("DOMContentLoaded", () => {
+        initAuth();
+
+        // Demo: crear algunos datos de prueba
+        if (localStorage.getItem(EXERCISES_KEY) === null) {
+          allExercises = [
+            { id: 1, name: "Flexiones", description: "Pecho", caloriesPerRep: 0.5 },
+            { id: 2, name: "Sentadillas", description: "Piernas", caloriesPerRep: 0.8 },
+          ];
+          localStorage.setItem(EXERCISES_KEY, JSON.stringify(allExercises));
+        }
+      });
     </script>
   </body>
 </html>
