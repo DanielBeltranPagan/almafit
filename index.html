@@ -1,817 +1,516 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlmaFit - Elite Training System</title>
-    <style>
-        :root {
-            --bg-dark: #09090b;
-            --bg-card: rgba(22, 22, 27, 0.7);
-            --bg-card-solid: #18181c;
-            --primary: #00f2fe;
-            --primary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            --accent: #ff5e62;
-            --accent-gradient: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.06);
-            --success: #10b981;
-            --calories: #f59e0b;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlmaFit</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <section id="view-auth" class="view-section">
+        <div class="profile-card" style="margin-top: 50px">
+          <h2 style="text-align: center; margin-bottom: 5px">
+            Bienvenido a Alma<span>Fit</span>
+          </h2>
+          <p class="subtitle" style="text-align: center">
+            Introduce tus credenciales para acceder a tus datos privados.
+          </p>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.03) 0%, transparent 40%),
-                              radial-gradient(circle at 10% 80%, rgba(255, 94, 98, 0.03) 0%, transparent 40%);
-            color: var(--text-main); min-height: 100vh; display: flex;
-        }
-
-        .hidden { display: none !important; }
-        button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
-        button:active { transform: scale(0.97); }
-
-        input, select, textarea {
-            background: rgba(28, 28, 35, 0.8); border: 1px solid var(--border);
-            color: white; padding: 10px; border-radius: 8px; outline: none; text-align: center;
-        }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.15); }
-
-        /* PANTALLA DE AUTENTICACIÓN */
-        .auth-container {
-            width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            padding: 20px; background: var(--bg-dark);
-        }
-        .auth-box {
-            background: var(--bg-card-solid); border: 1px solid var(--border);
-            padding: 40px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-        .auth-box h2 { font-size: 2rem; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
-        .auth-box p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem; }
-        .auth-form { display: flex; flex-direction: column; gap: 15px; }
-        .auth-form input { text-align: left; padding: 12px; font-size: 0.95rem; }
-        .auth-toggle { margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; display: inline-block; }
-        .auth-toggle:hover { color: var(--primary); text-decoration: underline; }
-
-        /* CONTENEDOR DE LA APP (OCULTO POR DEFECTO) */
-        .app-container { width: 100%; min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
-
-        sidebar {
-            background: rgba(14, 14, 18, 0.95); backdrop-filter: blur(10px);
-            border-right: 1px solid var(--border); padding: 40px 24px;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-        .sidebar-logo { font-size: 1.8rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 40px; text-align: center; }
-        .user-mini-profile { display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--border); }
-        .user-mini-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        
-        .nav-menu { display: flex; flex-direction: column; gap: 6px; }
-        .nav-item { padding: 14px 18px; border-radius: 10px; color: var(--text-muted); cursor: pointer; font-weight: 600; transition: all 0.2s; }
-        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
-        .nav-item.active { background: var(--primary-gradient); color: #01080e; }
-
-        main { padding: 40px; overflow-y: auto; max-height: 100vh; width: 100%; }
-        .view-section { animation: fadeIn 0.25s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .view-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 4px; }
-        .view-subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
-
-        .card { background: var(--bg-card); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 16px; padding: 30px; margin-bottom: 25px; }
-
-        /* SELECCIÓN DE RUTINAS */
-        .routine-buttons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .btn-routine-trigger { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: white; padding: 20px; font-size: 1.05rem; border-radius: 12px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; }
-        .btn-routine-trigger:hover { border-color: var(--primary); background: rgba(0, 242, 254, 0.04); transform: translateY(-2px); }
-        .btn-routine-trigger.active { background: var(--primary-gradient); color: #000; font-weight: 700; border-color: transparent; }
-
-        /* DASHBOARD */
-        .grid-dashboard { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; }
-        .records-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .record-row { display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border); }
-
-        /* REJILLAS */
-        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .item-card { background: rgba(32,32,40,0.5); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 150px; }
-        .item-card h3 { color: var(--primary); margin-bottom: 10px; }
-        .item-card-actions { display: flex; gap: 10px; margin-top: 10px; }
-
-        /* SERIES */
-        .exercise-workout-block { background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; position: relative; }
-        .exercise-workout-title { font-size: 1.1rem; color: var(--primary); margin-bottom: 15px; font-weight: 700; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .series-row { display: grid; grid-template-columns: 80px 1fr 1fr 40px; gap: 15px; align-items: center; margin-bottom: 10px; }
-        .series-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); margin: 0 auto; transition: background 0.3s; }
-        .status-dot.filled { background: var(--success); box-shadow: 0 0 8px var(--success); }
-
-        /* CALENDARIO */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
-        .calendar-day { background: rgba(255,255,255,0.01); padding: 15px 0; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; position: relative; min-height: 95px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
-        .calendar-day:hover { border-color: var(--primary); background: rgba(255,255,255,0.04); }
-        .dot-container { display: flex; gap: 4px; margin-top: 4px; }
-        .dot-rt { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; }
-        .dot-cd { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
-        .cal-burn-badge { font-size: 0.7rem; color: var(--calories); font-weight: bold; margin-top: 2px; }
-
-        /* BOTONES */
-        .btn-prime { background: var(--primary-gradient); color: #000; padding: 12px 24px; font-size: 0.95rem; }
-        .btn-prime:hover { opacity: 0.9; }
-        .btn-action-outline { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: white; padding: 12px; font-size: 0.95rem; border-radius: 8px; text-align: left; }
-        .btn-action-outline:hover { border-color: var(--primary); background: rgba(0, 242, 254, 0.02); }
-        .btn-danger-clear { background: rgba(255,94,98,0.1); color: #ff5e62; border: 1px solid rgba(255,94,98,0.15); padding: 6px 12px; font-size: 0.8rem; }
-        .btn-danger-clear:hover { background: #ff5e62; color: #000; }
-        .btn-secondary { background: rgba(255,255,255,0.06); color: white; padding: 12px; font-size: 0.95rem; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
-        .btn-success-save { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px 24px; font-size: 0.95rem; }
-        .btn-success-save:hover { background: #10b981; color: white; }
-        .btn-edit { background: rgba(79, 172, 254, 0.2); color: #4facfe; border: 1px solid rgba(79, 172, 254, 0.3); padding: 6px 12px; font-size: 0.8rem; }
-        .btn-edit:hover { background: #4facfe; color: #000; }
-
-        /* MODALES */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal-box { background: #18181c; border: 1px solid var(--border); border-radius: 16px; padding: 30px; width: 100%; max-width: 500px; }
-        .checkbox-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-    </style>
-</head>
-<body>
-
-    <div id="auth-screen" class="auth-container">
-        <div class="auth-box">
-            <h2 id="auth-title">Iniciar Sesión</h2>
-            <p id="auth-subtitle">Accede a tu panel táctico de AlmaFit</p>
-            
-            <div class="auth-form">
-                <input type="email" id="auth-email" placeholder="Correo Electrónico">
-                <input type="password" id="auth-password" placeholder="Contraseña">
-                <button id="btn-auth-submit" class="btn-prime" style="padding:14px; font-size:1rem;">Entrar al Sistema</button>
+          <form id="auth-form">
+            <div class="form-group">
+              <label for="auth-email">Correo Electrónico</label>
+              <input
+                type="email"
+                id="auth-email"
+                placeholder="ejemplo@correo.com"
+                required
+              />
             </div>
-            
-            <span id="auth-toggle-btn" class="auth-toggle">¿No tienes cuenta? Regístrate aquí</span>
+            <div class="form-group">
+              <label for="auth-password">Contraseña</label>
+              <input
+                type="password"
+                id="auth-password"
+                placeholder="******"
+                minlength="6"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              id="btn-login"
+              class="btn-save"
+              style="background-color: var(--accent)"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              type="button"
+              id="btn-register"
+              class="btn-save"
+              style="background-color: #334155; margin-top: 8px"
+            >
+              Registrarse como nuevo usuario
+            </button>
+          </form>
         </div>
-    </div>
+      </section>
 
-    <div id="app-screen" class="app-container hidden">
-        <sidebar>
-            <div>
-                <div class="sidebar-logo">AlmaFit</div>
-                <div class="user-mini-profile">
-                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=150" id="side-avatar" class="user-mini-avatar" alt="Avatar">
-                    <div>
-                        <div id="side-username" style="font-weight: 700;">Cargando...</div>
-                    </div>
+      <div id="app-content" class="d-none">
+        <header
+          class="main-header"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+          "
+        >
+          <div>
+            <h1 style="font-size: 2rem; text-align: left">
+              Alma<span>Fit</span>
+            </h1>
+          </div>
+          <button
+            id="btn-logout"
+            style="
+              background: none;
+              border: 1px solid #ef4444;
+              color: #ef4444;
+              padding: 5px 10px;
+              border-radius: 6px;
+              font-size: 0.8rem;
+              cursor: pointer;
+              font-weight: bold;
+            "
+          >
+            Cerrar Sesión 🚪
+          </button>
+        </header>
+
+        <section id="view-home" class="view-section">
+          <div class="welcome-card">
+            <h2>¡Hola<span id="welcome-name">!</span></h2>
+            <p class="subtitle">
+              Este es tu resumen energético de entrenamientos.
+            </p>
+
+            <div class="quick-stats">
+              <div
+                class="stat-box"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                  height: 110px;
+                  padding: 12px;
+                  position: relative;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    width: 100%;
+                    gap: 5px;
+                  "
+                >
+                  <span
+                    class="stat-title"
+                    id="cal-stat-title"
+                    style="
+                      text-align: left;
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      max-width: 60%;
+                    "
+                    >Calorías Hoy</span
+                  >
+                  <button
+                    id="btn-toggle-cal"
+                    style="
+                      background: var(--border-color);
+                      border: none;
+                      color: var(--text-main);
+                      font-size: 0.75rem;
+                      padding: 4px 8px;
+                      border-radius: 6px;
+                      cursor: pointer;
+                      font-weight: bold;
+                      white-space: nowrap;
+                    "
+                  >
+                    🗓️ Semana
+                  </button>
                 </div>
-                <div class="nav-menu">
-                    <div class="nav-item active" id="nav-inicio" onclick="window.switchView('view-inicio', this)">Inicio</div>
-                    <div class="nav-item" onclick="window.switchView('view-entrenar', this)">¡A Entrenar!</div>
-                    <div class="nav-item" onclick="window.switchView('view-ejercicios', this)">Ejercicios</div>
-                    <div class="nav-item" onclick="window.switchView('view-rutinas', this)">Rutinas</div>
-                    <div class="nav-item" onclick="window.switchView('view-cardio', this)">Cardio</div>
-                    <div class="nav-item" onclick="window.switchView('view-calendario', this)">Historial</div>
-                    <div class="nav-item" onclick="window.switchView('view-perfil', this)">Perfil</div>
-                </div>
+                <span
+                  class="stat-value"
+                  id="stat-calories-burn"
+                  style="
+                    font-size: 1.6rem;
+                    margin-top: auto;
+                    text-align: left;
+                    display: block;
+                    width: 100%;
+                  "
+                  >0 kcal</span
+                >
+              </div>
+
+              <div
+                class="stat-box"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                  height: 110px;
+                  padding: 12px;
+                "
+              >
+                <span
+                  class="stat-title"
+                  style="text-align: left; font-weight: 600"
+                  >Ejercicios Creados</span
+                >
+                <span
+                  class="stat-value"
+                  id="stat-exercises"
+                  style="font-size: 1.6rem; text-align: left"
+                  >0</span
+                >
+              </div>
             </div>
-            <button class="btn-danger-clear" style="border-radius:8px; padding:12px;" id="btn-logout">Cerrar Sesión ✕</button>
-        </sidebar>
+          </div>
+        </section>
 
-        <main>
-            <section id="view-inicio" class="view-section">
-                <h2 class="view-title">Tu Panel de Control</h2>
-                <p class="view-subtitle">Récords y balance de calorías reales acumuladas hoy.</p>
-                
-                <div class="grid-dashboard">
-                    <div>
-                        <div class="card">
-                            <h3 style="color: var(--primary); margin-bottom: 15px;">Récords Históricos Reales (PRs)</h3>
-                            <div class="records-list" id="dashboard-prs-container"></div>
-                        </div>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:20px;">
-                        <div class="card" style="text-align:center; padding:30px 20px;">
-                            <h3 style="color:var(--text-muted); font-size:0.9rem; text-transform:uppercase;">Días Registrados</h3>
-                            <p style="font-size: 4rem; font-weight:800; background: var(--primary-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;" id="dash-days-count">0</p>
-                        </div>
-                        <div class="card" style="display:flex; flex-direction:column; gap:10px;">
-                            <h3 style="font-size:1rem; margin-bottom:5px;">Accesos Rápidos</h3>
-                            <button class="btn-action-outline" onclick="window.switchView('view-entrenar', document.querySelectorAll('.nav-item')[1])">Lanzar Sesión de Entrenamiento ⚡</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <section id="view-exercises" class="view-section d-none">
+          <div class="profile-card">
+            <h2>Banco de Ejercicios</h2>
+            <p class="subtitle">
+              Crea los ejercicios que usarás en tus rutinas.
+            </p>
 
-            <section id="view-entrenar" class="view-section hidden">
-                <h2 class="view-title">Zona de Combate</h2>
-                <p class="view-subtitle">Pulsa el botón de la rutina que vayas a realizar.</p>
-                
-                <div class="card">
-                    <h3 style="margin-bottom: 15px;">Selecciona tu rutina:</h3>
-                    
-                    <div class="routine-buttons-grid" id="workout-routine-buttons-container"></div>
+            <form id="exercise-form">
+              <div class="form-group">
+                <label for="exercise-name">Nombre del Ejercicio</label>
+                <input
+                  type="text"
+                  id="exercise-name"
+                  placeholder="Ej: Press de Banca"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="exercise-muscle">Grupo Muscular</label>
+                <select id="exercise-muscle" required>
+                  <option value="" disabled selected>Selecciona músculo</option>
+                  <option value="Pecho">Pecho</option>
+                  <option value="Espalda">Espalda</option>
+                  <option value="Pierna">Pierna</option>
+                  <option value="Hombro">Hombro</option>
+                  <option value="Bíceps">Bíceps</option>
+                  <option value="Tríceps">Tríceps</option>
+                  <option value="Abdomen">Abdomen</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-save">＋ Añadir al Banco</button>
+            </form>
 
-                    <div id="active-workout-zone" class="hidden" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: var(--primary);" id="active-workout-title">Ejecutando</h3>
-                            <span id="save-status-text" style="font-size: 0.85rem; color: var(--text-muted);">Escribe libremente</span>
-                        </div>
-                        
-                        <div id="active-exercises-inputs-container"></div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
-                            <button class="btn-success-save" onclick="window.saveWorkoutProgress(false)">💾 Guardar Progreso</button>
-                            <button class="btn-prime" onclick="window.saveWorkoutProgress(true)">🔒 Finalizar Bloque</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-ejercicios" class="view-section hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h2 class="view-title" style="margin: 0;">Banco de Ejercicios</h2>
-                    <button class="btn-prime" onclick="window.openExerciseModal()">+ Crear Ejercicio</button>
-                </div>
-                <div class="items-grid" id="exercises-container"></div>
-            </section>
-
-            <section id="view-rutinas" class="view-section hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h2 class="view-title" style="margin: 0;">Mis Rutinas Diseñadas</h2>
-                    <button class="btn-prime" onclick="window.openRoutineModal()">+ Diseñar Nueva Rutina</button>
-                </div>
-                <div class="items-grid" id="routines-container"></div>
-            </section>
-
-            <section id="view-cardio" class="view-section hidden">
-                <h2 class="view-title">Estación de Cardio</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:25px;">
-                    <div class="card">
-                        <h3 style="margin-bottom:20px; color:var(--accent)">Nueva Sesión</h3>
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            <label style="font-size:0.85rem;">Tipo de Actividad</label>
-                            <select id="cd-type">
-                                <option value="Cinta">Cinta de Correr</option>
-                                <option value="Bicicleta">Bicicleta Estática</option>
-                                <option value="Elíptica">Elíptica</option>
-                            </select>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                                <div style="display:flex; flex-direction:column; gap:5px;"><label style="font-size:0.85rem;">Tiempo (min)</label><input type="number" id="cd-time" placeholder="30"></div>
-                                <div style="display:flex; flex-direction:column; gap:5px;"><label style="font-size:0.85rem;">Velocidad (km/h)</label><input type="number" id="cd-speed" step="0.1" placeholder="9.0"></div>
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:5px;"><label style="font-size:0.85rem;">Inclinación (%)</label><input type="number" id="cd-incline" placeholder="0"></div>
-                            <button class="btn-prime" style="background:var(--accent-gradient); color:white; margin-top:10px; padding:12px;" onclick="window.addCardioToday()">Guardar Cardio</button>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3 style="margin-bottom:15px;">Historial de Cardio</h3>
-                        <div id="cardio-list-container"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-calendario" class="view-section hidden">
-                <h2 class="view-title">Bitácora de Entrenamientos</h2>
-                <div class="card">
-                    <div style="text-align:center; margin-bottom:20px;"><h3>Historial</h3></div>
-                    <div class="calendar-grid" id="calendar-container"></div>
-                </div>
-            </section>
-
-            <section id="view-perfil" class="view-section hidden">
-                <h2 class="view-title">Perfil de Atleta</h2>
-                <div class="card">
-                    <div style="display:grid; grid-template-columns:200px 1fr; gap:40px;">
-                        <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
-                            <img src="" id="p-avatar-preview" style="width:130px; height:130px; border-radius:20px; object-fit:cover;" alt="Avatar">
-                            <input type="file" id="p-avatar-file" accept="image/*" style="font-size:0.8rem; width:100%; border:none; background:none;">
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:15px;">
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <label style="text-align:left; display:block; font-size:0.9rem;">Nombre de Perfil</label>
-                                <input type="text" id="p-nombre" placeholder="Tu nombre" style="text-align:left;">
-                            </div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                                <div style="display:flex; flex-direction:column; gap:5px;"><label style="text-align:left; font-size:0.9rem;">Estatura (cm)</label><input type="number" id="p-altura"></div>
-                                <div style="display:flex; flex-direction:column; gap:5px;"><label style="text-align:left; font-size:0.9rem;">Peso Privado (kg)</label><input type="number" id="p-peso" step="0.1"></div>
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <label style="text-align:left; font-size:0.9rem;">Sexo</label>
-                                <select id="p-sexo" style="text-align:left;">
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                </select>
-                            </div>
-                            <button class="btn-prime" style="align-self:flex-start; margin-top:10px;" onclick="window.saveProfile()">Guardar Cambios</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <div id="exercise-modal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3 style="margin-bottom:20px;" id="ex-modal-title">Registrar Ejercicio</h3>
-            <input type="hidden" id="ex-edit-id">
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                <input type="text" id="ex-name" placeholder="Nombre del Ejercicio">
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button class="btn-secondary" onclick="window.closeExerciseModal()">Cancelar</button>
-                    <button class="btn-prime" onclick="window.saveExercise()">Confirmar</button>
-                </div>
+            <div class="exercise-list-container">
+              <h3>Mis Ejercicios</h3>
+              <ul id="exercise-list"></ul>
             </div>
-        </div>
-    </div>
+          </div>
+        </section>
 
-    <div id="routine-modal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3 style="margin-bottom:15px;" id="rt-modal-title">Diseñar Estructura</h3>
-            <input type="hidden" id="rt-edit-id">
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                <input type="text" id="rt-name" placeholder="Nombre de Rutina">
-                <div>
-                    <label style="font-size:0.85rem; color:var(--text-muted); display:block; margin-bottom:6px; text-align:left;">Ejercicios incluidos:</label>
-                    <div class="checkbox-list" id="rt-checkboxes-container"></div>
-                </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button class="btn-secondary" onclick="window.closeRoutineModal()">Cancelar</button>
-                    <button class="btn-prime" onclick="window.saveRoutine()">Guardar Diseño</button>
-                </div>
+        <section id="view-routines" class="view-section d-none">
+          <div class="profile-card">
+            <h2 id="routine-form-title">Nombre de la Rutina</h2>
+            <p class="subtitle">
+              Agrupa tus ejercicios para poder entrenarlos.
+            </p>
+
+            <form id="routine-form">
+              <input type="hidden" id="edit-routine-id" />
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="routine-name"
+                  placeholder="Ej: Empuje / Tirón"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Selecciona los Ejercicios</label>
+                <div
+                  class="checkbox-container"
+                  id="routine-exercise-checkboxes"
+                ></div>
+              </div>
+
+              <button type="submit" class="btn-save" id="btn-routine-submit">
+                Crear Rutina
+              </button>
+              <button
+                type="button"
+                class="btn-save d-none"
+                id="btn-cancel-edit"
+                style="background-color: #64748b; margin-top: 5px"
+              >
+                Cancelar Edición
+              </button>
+            </form>
+
+            <div class="routine-list-container">
+              <h3>Mis Rutinas</h3>
+              <div id="routine-list"></div>
             </div>
-        </div>
-    </div>
+          </div>
+        </section>
 
-    <div id="day-detail-modal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3 style="margin-bottom:15px;" id="detail-modal-date">Entrenamientos del día</h3>
-            <div id="detail-modal-content" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;"></div>
-            <div style="display:flex; justify-content:flex-end;">
-                <button class="btn-secondary" onclick="document.getElementById('day-detail-modal').classList.add('hidden')">Cerrar</button>
+        <section id="view-workout" class="view-section d-none">
+          <div class="profile-card" style="padding: 20px">
+            <h2>Modo Entrenamiento</h2>
+            <p class="subtitle">Selecciona qué vas a realizar hoy.</p>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px">
+              <button
+                id="tab-pesas"
+                style="
+                  flex: 1;
+                  padding: 10px;
+                  border-radius: 8px;
+                  border: none;
+                  font-weight: 700;
+                  color: white;
+                  cursor: pointer;
+                "
+              >
+                🏋️ Pesas
+              </button>
+              <button
+                id="tab-cardio"
+                style="
+                  flex: 1;
+                  padding: 10px;
+                  border-radius: 8px;
+                  border: none;
+                  font-weight: 700;
+                  color: white;
+                  cursor: pointer;
+                "
+              >
+                🏃 Cardio
+              </button>
             </div>
-        </div>
+
+            <div id="block-pesas-content">
+              <div class="form-group">
+                <label for="workout-routine-select">Elige tu Rutina</label>
+                <select id="workout-routine-select"></select>
+              </div>
+              <div id="workout-exercises-container"></div>
+              <button
+                id="btn-finish-workout"
+                class="btn-save d-none"
+                style="margin-top: 20px"
+              >
+                💾 Terminar y Guardar Entreno
+              </button>
+            </div>
+
+            <div id="block-cardio-content" class="d-none">
+              <form id="cardio-form">
+                <div class="form-group">
+                  <label for="cardio-time">Tiempo (Minutos)</label>
+                  <input
+                    type="number"
+                    id="cardio-time"
+                    placeholder="Ej: 30"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="cardio-speed">Velocidad de la Cinta (km/h)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    id="cardio-speed"
+                    placeholder="Ej: 8.5"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="cardio-incline"
+                    >Inclinación de la Cinta (%)</label
+                  >
+                  <input
+                    type="number"
+                    step="0.5"
+                    id="cardio-incline"
+                    placeholder="Ej: 2.0"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="btn-save"
+                  style="background-color: #10b981"
+                >
+                  💾 Guardar Sesión Cardio
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-calendar" class="view-section d-none">
+          <div class="calendar-container">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+              "
+            >
+              <h3 id="calendar-month-year" style="margin: 0">Mes Año</h3>
+              <div class="calendar-controls">
+                <button id="btn-prev-month">◀</button>
+                <button id="btn-next-month">▶</button>
+              </div>
+            </div>
+
+            <div class="calendar-weekdays">
+              <div>L</div>
+              <div>M</div>
+              <div>X</div>
+              <div>J</div>
+              <div>V</div>
+              <div>S</div>
+              <div>D</div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+
+          <div style="margin-top: 20px">
+            <h3 id="day-detail-title">Resultados del día</h3>
+            <div
+              id="day-history-list"
+              style="display: flex; flex-direction: column; gap: 8px"
+            ></div>
+          </div>
+
+          <button
+            id="btn-clear-history"
+            style="
+              width: 100%;
+              background: none;
+              border: 1px dashed #ef4444;
+              color: #ef4444;
+              padding: 10px;
+              margin-top: 30px;
+              border-radius: 8px;
+              font-weight: bold;
+              cursor: pointer;
+            "
+          >
+            ⚠️ Vaciar todo el historial
+          </button>
+        </section>
+
+        <section id="view-profile" class="view-section d-none">
+          <div class="profile-card">
+            <h2>Mis Datos Personales</h2>
+            <p class="subtitle">
+              Esencial para estimar tus calorías correctamente.
+            </p>
+
+            <form id="profile-form">
+              <div class="form-group">
+                <label for="username">Nombre Completo</label>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Tu nombre"
+                  required
+                />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="age">Edad</label>
+                  <input type="number" id="age" placeholder="Años" required />
+                </div>
+                <div class="form-group">
+                  <label for="gender">Sexo Biológico</label>
+                  <select id="gender" required>
+                    <option value="hombre">Hombre</option>
+                    <option value="mujer">Mujer</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="weight">Peso Actual (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    id="weight"
+                    placeholder="Ej: 75.4"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="height">Altura (cm)</label>
+                  <input
+                    type="number"
+                    id="height"
+                    placeholder="Ej: 178"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn-save">
+                💾 Guardar Configuración
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <nav class="bottom-nav">
+          <button class="nav-btn active" data-target="view-home">
+            <span class="nav-icon">🏠</span><span class="nav-text">Inicio</span>
+          </button>
+          <button class="nav-btn" data-target="view-exercises">
+            <span class="nav-icon">💪</span
+            ><span class="nav-text">Ejercicios</span>
+          </button>
+          <button class="nav-btn" data-target="view-routines">
+            <span class="nav-icon">📋</span
+            ><span class="nav-text">Rutinas</span>
+          </button>
+          <button class="nav-btn" data-target="view-workout">
+            <span class="nav-icon">⚡</span
+            ><span class="nav-text">Entrenar</span>
+          </button>
+          <button class="nav-btn" data-target="view-calendar">
+            <span class="nav-icon">📅</span
+            ><span class="nav-text">Calendario</span>
+          </button>
+          <button class="nav-btn" data-target="view-profile">
+            <span class="nav-icon">👤</span><span class="nav-text">Perfil</span>
+          </button>
+        </nav>
+      </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDHh31tVSln-N_YOLQgF1lyd1Y6lUN8qq8",
-            authDomain: "almafit-c472c.firebaseapp.com",
-            databaseURL: "https://almafit-c472c-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "almafit-c472c",
-            storageBucket: "almafit-c472c.firebasestorage.app",
-            messagingSenderId: "728267001573",
-            appId: "1:728267001573:web:84f8bb3cf000692ebdce0c",
-            measurementId: "G-LGHGGZXS2V"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const auth = getAuth(app);
-        const storage = getStorage(app);
-
-        let USER_ID = null; 
-        let isSignUpMode = false;
-        let db = {};
-
-        const getTodayString = () => {
-            const d = new Date();
-            return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
-        };
-
-        // INTERFAZ DE AUTENTICACIÓN (LOGIN / REGISTRO)
-        const toggleAuthMode = () => {
-            isSignUpMode = !isSignUpMode;
-            document.getElementById('auth-title').innerText = isSignUpMode ? "Crear Cuenta" : "Iniciar Sesión";
-            document.getElementById('auth-subtitle').innerText = isSignUpMode ? "Regístrate para empezar a guardar tus PRs" : "Accede a tu panel táctico de AlmaFit";
-            document.getElementById('btn-auth-submit').innerText = isSignUpMode ? "Registrar y Entrar" : "Entrar al Sistema";
-            document.getElementById('auth-toggle-btn').innerText = isSignUpMode ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate aquí";
-        };
-        document.getElementById('auth-toggle-btn').onclick = toggleAuthMode;
-
-        document.getElementById('btn-auth-submit').onclick = async () => {
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-
-            if(!email || !password) return alert("Por favor, rellena todos los campos.");
-
-            try {
-                if (isSignUpMode) {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    alert("¡Cuenta creada con éxito!");
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-            } catch (error) {
-                alert("Error de autenticación: " + error.message);
-            }
-        };
-
-        document.getElementById('btn-logout').onclick = () => {
-            signOut(auth);
-        };
-
-        // ESCUCHADOR DE ESTADO DE USUARIO (CUANDO INICIA O CIERRA SESIÓN)
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                USER_ID = user.uid;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                
-                const userRef = ref(database, 'usuarios/' + USER_ID);
-                const snapshot = await get(userRef);
-                
-                if (snapshot.exists()) {
-                    db = snapshot.val();
-                } else {
-                    db = {
-                        profile: { nombre: emailToUsername(user.email), altura: '175', peso: '74', sexo: 'Masculino', avatar: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=150' },
-                        exercises: [{ id: "ex_1", name: "Press de Banca" }, { id: "ex_2", name: "Sentadillas" }],
-                        routines: [{ id: "rt_1", name: "Fullbody A", exerciseIds: ["ex_1", "ex_2"] }],
-                        cardio: [], calendar: {}, currentActiveRoutineId: ""
-                    };
-                }
-                initSystem();
-            } else {
-                USER_ID = null;
-                document.getElementById('app-screen').classList.add('hidden');
-                document.getElementById('auth-screen').classList.remove('hidden');
-            }
-        });
-
-        function emailToUsername(email) {
-            return email.split('@')[0];
-        }
-
-        function initSystem() {
-            if (!db.exercises) db.exercises = [];
-            if (!db.routines) db.routines = [];
-            if (!db.cardio) db.cardio = [];
-            if (!db.calendar) db.calendar = {};
-
-            document.getElementById('p-nombre').value = db.profile.nombre || 'Atleta';
-            document.getElementById('p-altura').value = db.profile.altura || '175';
-            document.getElementById('p-peso').value = db.profile.peso || '74';
-            document.getElementById('p-sexo').value = db.profile.sexo || 'Masculino';
-            document.getElementById('p-avatar-preview').src = db.profile.avatar;
-            document.getElementById('side-avatar').src = db.profile.avatar;
-            document.getElementById('side-username').innerText = db.profile.nombre || 'Atleta';
-
-            // Listener para cambio de foto
-            document.getElementById('p-avatar-file').addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if(file) {
-                    try {
-                        const filename = `${USER_ID}/avatar_${Date.now()}`;
-                        const fileRef = storageRef(storage, filename);
-                        await uploadBytes(fileRef, file);
-                        const downloadURL = await getDownloadURL(fileRef);
-                        db.profile.avatar = downloadURL;
-                        document.getElementById('p-avatar-preview').src = downloadURL;
-                        document.getElementById('side-avatar').src = downloadURL;
-                        await set(ref(database, 'usuarios/' + USER_ID), db);
-                        alert("Foto actualizada exitosamente");
-                    } catch (error) {
-                        console.error("Error subiendo foto:", error);
-                        alert("Error al subir la foto");
-                    }
-                }
-            });
-
-            window.saveAndRefresh();
-        }
-
-        window.saveAndRefresh = async function() {
-            if(!USER_ID) return;
-            document.getElementById('side-username').innerText = db.profile.nombre || 'Atleta';
-            refreshDashboard();
-            renderRoutineButtons();
-            renderExercises();
-            renderRoutines();
-            renderCardio();
-            initCalendar();
-
-            try {
-                await set(ref(database, USER_ID), db);
-            } catch (error) {
-                console.error("Error sincronizando:", error);
-            }
-        };
-
-        window.switchView = function(viewId, element) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(viewId).classList.remove('hidden');
-            if(element) element.classList.add('active');
-        };
-
-        function refreshDashboard() {
-            document.getElementById('dash-days-count').innerText = Object.keys(db.calendar || {}).length;
-            const prContainer = document.getElementById('dashboard-prs-container');
-            prContainer.innerHTML = '';
-
-            let maxWeights = {}; 
-            Object.values(db.calendar || {}).forEach(day => {
-                if(day.routines) {
-                    day.routines.forEach(r => {
-                        if(r.snapshot) {
-                            r.snapshot.forEach(ex => {
-                                ex.series.forEach(serie => {
-                                    if(!maxWeights[ex.name] || serie.weight > maxWeights[ex.name].weight) {
-                                        maxWeights[ex.name] = { weight: serie.weight, reps: serie.reps };
-                                    }
-                                });
-                            });
-                        }
-                    });
-                }
-            });
-
-            const keys = Object.keys(maxWeights);
-            if(keys.length === 0) {
-                prContainer.innerHTML = '<p style="font-size:0.9rem; color:var(--text-muted)">Completa series para ver tus récords.</p>';
-                return;
-            }
-
-            keys.sort((a,b) => maxWeights[b].weight - maxWeights[a].weight);
-            keys.forEach(name => {
-                prContainer.innerHTML += `
-                    <div class="record-row">
-                        <span style="font-weight:600;">${name}</span>
-                        <span style="color:var(--primary); font-weight:bold;">${maxWeights[name].weight} kg <small style="color:var(--text-muted)">x${maxWeights[name].reps}</small></span>
-                    </div>`;
-            });
-        }
-
-        function renderRoutineButtons() {
-            const container = document.getElementById('workout-routine-buttons-container');
-            container.innerHTML = '';
-            if(!db.routines || db.routines.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No tienes rutinas creadas.</p>';
-                return;
-            }
-            db.routines.forEach(r => {
-                const activeClass = (db.currentActiveRoutineId === r.id) ? 'active' : '';
-                container.innerHTML += `<button class="btn-routine-trigger ${activeClass}" id="btn-rt-${r.id}"><span>🏋️ ${r.name}</span></button>`;
-            });
-            db.routines.forEach(r => {
-                const btn = document.getElementById(`btn-rt-${r.id}`);
-                if(btn) {
-                    btn.onclick = () => {
-                        document.querySelectorAll('.btn-routine-trigger').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        db.currentActiveRoutineId = r.id;
-                        loadActiveWorkoutForm();
-                    };
-                }
-            });
-        }
-
-        function loadActiveWorkoutForm() {
-            const rId = db.currentActiveRoutineId;
-            const zone = document.getElementById('active-workout-zone');
-            const container = document.getElementById('active-exercises-inputs-container');
-            container.innerHTML = '';
-            if(!rId) { zone.classList.add('hidden'); return; }
-
-            const routine = db.routines.find(r => r.id === rId);
-            document.getElementById('active-workout-title').innerText = `Ejecutando: ${routine.name}`;
-            
-            routine.exerciseIds.forEach(eid => {
-                const ex = db.exercises.find(e => e.id === eid);
-                if(ex) {
-                    let seriesHTML = '';
-                    for(let s = 1; s <= 3; s++) {
-                        seriesHTML += `
-                            <div class="series-row">
-                                <span class="series-label">Serie ${s}</span>
-                                <input type="number" class="run-weight" placeholder="Kilos" step="0.5">
-                                <input type="number" class="run-reps" placeholder="Reps">
-                                <div class="status-dot"></div>
-                            </div>`;
-                    }
-                    container.innerHTML += `<div class="exercise-workout-block" data-exname="${ex.name}"><div class="exercise-workout-title">${ex.name}</div>${seriesHTML}</div>`;
-                }
-            });
-            zone.classList.remove('hidden');
-        }
-
-        window.saveWorkoutProgress = function(finishAndExit = false) {
-            const today = getTodayString();
-            const rId = db.currentActiveRoutineId;
-            if(!rId) return;
-
-            const routine = db.routines.find(r => r.id === rId);
-            const blocks = document.querySelectorAll('#active-exercises-inputs-container .exercise-workout-block');
-            let snapshot = [];
-            let seriesCompletadas = 0;
-
-            blocks.forEach(block => {
-                const name = block.getAttribute('data-exname');
-                const rows = block.querySelectorAll('.series-row');
-                let seriesData = [];
-                rows.forEach(row => {
-                    const weight = parseFloat(row.querySelector('.run-weight').value);
-                    const reps = parseInt(row.querySelector('.run-reps').value);
-                    if(!isNaN(weight) && !isNaN(reps)) {
-                        seriesData.push({ weight, reps });
-                        seriesCompletadas++;
-                    }
-                });
-                if(seriesData.length > 0) snapshot.push({ name, series: seriesData });
-            });
-
-            let caloriesBurned = Math.round(seriesCompletadas * 9 * (parseFloat(db.profile.peso)/75));
-            if(!db.calendar[today]) db.calendar[today] = { routines: [], cardio: [] };
-            db.calendar[today].routines = db.calendar[today].routines.filter(r => r.name !== routine.name);
-            
-            if(snapshot.length > 0) db.calendar[today].routines.push({ name: routine.name, snapshot, calories: caloriesBurned });
-
-            window.saveAndRefresh();
-            if(finishAndExit) {
-                db.currentActiveRoutineId = "";
-                document.getElementById('active-workout-zone').classList.add('hidden');
-                window.switchView('view-inicio', document.getElementById('nav-inicio'));
-            }
-        };
-
-        window.addCardioToday = function() {
-            const today = getTodayString();
-            const type = document.getElementById('cd-type').value;
-            const time = parseInt(document.getElementById('cd-time').value);
-            const speed = parseFloat(document.getElementById('cd-speed').value);
-            if(isNaN(time) || isNaN(speed)) return alert("Datos inválidos.");
-
-            let calories = Math.round((time * 7 * parseFloat(db.profile.peso)) / 60);
-            if(!db.calendar[today]) db.calendar[today] = { routines: [], cardio: [] };
-            if(!db.calendar[today].cardio) db.calendar[today].cardio = [];
-            db.calendar[today].cardio.push({ type, time, speed, calories });
-            db.cardio.unshift({ type, time, speed, calories, date: today });
-            window.saveAndRefresh();
-        };
-
-        function renderCardio() {
-            const c = document.getElementById('cardio-list-container'); c.innerHTML = '';
-            db.cardio.slice(0,5).forEach(cd => {
-                c.innerHTML += `<div class="record-row"><span>${cd.type} (${cd.time} min)</span><span style="color:var(--calories)">${cd.calories} kcal</span></div>`;
-            });
-        }
-
-        function initCalendar() {
-            const container = document.getElementById('calendar-container'); container.innerHTML = '';
-            for(let day=1; day<=31; day++) {
-                const dayEl = document.createElement('div'); dayEl.className = 'calendar-day';
-                const dateStr = `2026-05-${day.toString().padStart(2, '0')}`;
-                let total = 0;
-                if(db.calendar[dateStr]) {
-                    if(db.calendar[dateStr].routines) db.calendar[dateStr].routines.forEach(r => total += r.calories || 0);
-                    if(db.calendar[dateStr].cardio) db.calendar[dateStr].cardio.forEach(c => total += c.calories || 0);
-                }
-                dayEl.innerHTML = `<span style="font-weight:600;">${day}</span>${total > 0 ? `<div class="cal-burn-badge">🔥 ${total}k</div>` : ''}`;
-                dayEl.onclick = () => openDayDetailModal(dateStr);
-                container.appendChild(dayEl);
-            }
-        }
-
-        function openDayDetailModal(dateStr) {
-            document.getElementById('day-detail-modal').classList.remove('hidden');
-            const content = document.getElementById('detail-modal-content'); content.innerHTML = '';
-            if(!db.calendar[dateStr]) { content.innerHTML = '<p>No hay entrenamientos.</p>'; return; }
-            
-            content.innerHTML = `<p style="color:var(--primary)">Datos guardados en la nube para el día ${dateStr}</p>`;
-        }
-
-        /* === AUXILIARES MODALES === */
-        window.openExerciseModal = function(exId = null) { 
-            const modal = document.getElementById('exercise-modal');
-            const titleEl = document.getElementById('ex-modal-title');
-            const nameInput = document.getElementById('ex-name');
-            const editIdInput = document.getElementById('ex-edit-id');
-            
-            if(exId) {
-                const exercise = db.exercises.find(e => e.id === exId);
-                titleEl.innerText = "Editar Ejercicio";
-                nameInput.value = exercise.name;
-                editIdInput.value = exId;
-            } else {
-                titleEl.innerText = "Registrar Ejercicio";
-                nameInput.value = "";
-                editIdInput.value = "";
-            }
-            modal.classList.remove('hidden');
-        };
-        window.closeExerciseModal = function() { document.getElementById('exercise-modal').classList.add('hidden'); };
-        window.saveExercise = function() {
-            const name = document.getElementById('ex-name').value.trim();
-            const editId = document.getElementById('ex-edit-id').value;
-            
-            if(name) {
-                if(editId) {
-                    const ex = db.exercises.find(e => e.id === editId);
-                    if(ex) ex.name = name;
-                } else {
-                    db.exercises.push({ id: "ex_" + Date.now(), name });
-                }
-            }
-            window.saveAndRefresh(); 
-            window.closeExerciseModal();
-        };
-        function renderExercises() {
-            const c = document.getElementById('exercises-container'); c.innerHTML = '';
-            db.exercises.forEach(ex => {
-                c.innerHTML += `<div class="item-card">
-                    <h3>${ex.name}</h3>
-                    <div class="item-card-actions">
-                        <button class="btn-edit" onclick="window.openExerciseModal('${ex.id}')">✎ Editar</button>
-                        <button class="btn-danger-clear" onclick="window.deleteExercise('${ex.id}')">✕ Eliminar</button>
-                    </div>
-                </div>`;
-            });
-        }
-
-        window.deleteExercise = function(exId) {
-            db.exercises = db.exercises.filter(e => e.id !== exId);
-            window.saveAndRefresh();
-        };
-
-        window.openRoutineModal = function(rtId = null) {
-            const modal = document.getElementById('routine-modal');
-            const titleEl = document.getElementById('rt-modal-title');
-            const nameInput = document.getElementById('rt-name');
-            const editIdInput = document.getElementById('rt-edit-id');
-            const checkContainer = document.getElementById('rt-checkboxes-container');
-            
-            checkContainer.innerHTML = '';
-            db.exercises.forEach(ex => {
-                checkContainer.innerHTML += `<label style="display:flex; gap:8px;"><input type="checkbox" name="rt-ex-nodes" value="${ex.id}"> ${ex.name}</label>`;
-            });
-            
-            if(rtId) {
-                const routine = db.routines.find(r => r.id === rtId);
-                titleEl.innerText = "Editar Rutina";
-                nameInput.value = routine.name;
-                editIdInput.value = rtId;
-                
-                routine.exerciseIds.forEach(eid => {
-                    const checkbox = document.querySelector(`input[name="rt-ex-nodes"][value="${eid}"]`);
-                    if(checkbox) checkbox.checked = true;
-                });
-            } else {
-                titleEl.innerText = "Diseñar Estructura";
-                nameInput.value = "";
-                editIdInput.value = "";
-            }
-            modal.classList.remove('hidden');
-        };
-        window.closeRoutineModal = function() { document.getElementById('routine-modal').classList.add('hidden'); };
-        window.saveRoutine = function() {
-            const name = document.getElementById('rt-name').value.trim();
-            const editId = document.getElementById('rt-edit-id').value;
-            const checked = document.querySelectorAll('input[name="rt-ex-nodes"]:checked');
-            let eIds = []; 
-            checked.forEach(cb => eIds.push(cb.value));
-            
-            if(name) {
-                if(editId) {
-                    const rt = db.routines.find(r => r.id === editId);
-                    if(rt) {
-                        rt.name = name;
-                        rt.exerciseIds = eIds;
-                    }
-                } else {
-                    db.routines.push({ id: "rt_" + Date.now(), name, exerciseIds: eIds });
-                }
-            }
-            window.saveAndRefresh(); 
-            window.closeRoutineModal();
-        };
-        function renderRoutines() {
-            const c = document.getElementById('routines-container'); c.innerHTML = '';
-            db.routines.forEach(rt => {
-                c.innerHTML += `<div class="item-card">
-                    <h3>${rt.name}</h3>
-                    <div class="item-card-actions">
-                        <button class="btn-edit" onclick="window.openRoutineModal('${rt.id}')">✎ Editar</button>
-                        <button class="btn-danger-clear" onclick="window.deleteRoutine('${rt.id}')">✕ Eliminar</button>
-                    </div>
-                </div>`;
-            });
-        }
-
-        window.deleteRoutine = function(rtId) {
-            db.routines = db.routines.filter(r => r.id !== rtId);
-            window.saveAndRefresh();
-        };
-
-        window.saveProfile = function() {
-            db.profile.nombre = document.getElementById('p-nombre').value.trim();
-            db.profile.altura = document.getElementById('p-altura').value;
-            db.profile.peso = document.getElementById('p-peso').value;
-            db.profile.sexo = document.getElementById('p-sexo').value;
-            window.saveAndRefresh();
-            alert("Perfil guardado.");
-        };
-    </script>
-</body>
+    <script type="module" src="app.js"></script>
+  </body>
 </html>
